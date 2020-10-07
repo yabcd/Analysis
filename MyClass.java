@@ -1,13 +1,13 @@
 import java.io.*;
 
-public class Analysis {
+public class MyClass {
     private char CHAR;
     private boolean newChar;
     private String TOKEN;
     private String SY;
     private Reader reader;
 
-    public Analysis(String path){
+    public MyClass(String path){
         newChar = true;
         File file = new File(path);
         try {
@@ -121,7 +121,7 @@ public class Analysis {
     }
 
     public static void main(String[] args) {
-        Analysis a = new Analysis(args[0]);
+        MyClass a = new MyClass(args[0]);
         a.run();
     }
 }
