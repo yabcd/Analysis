@@ -228,7 +228,10 @@ public final class Analyser {
             expect(TokenType.Semicolon);
             //加入符号表
             addSymbol(nameToken.getValueString(),true,true,nameToken.getStartPos());
+            //
+
             //增加指令
+            instructions.add(new Instruction(Operation.LIT,0));
             instructions.add(new Instruction(Operation.STO,getOffset(nameToken.getValueString(),nameToken.getStartPos())));
         }
     }
@@ -241,6 +244,7 @@ public final class Analyser {
             
             //加入符号表
             addSymbol(nameToken.getValueString(),false,false,nameToken.getStartPos());
+            instructions.add(new Instruction(Operation.LIT,0));
             
             if(nextIf(TokenType.Equal)!=null){
                 // 表达式

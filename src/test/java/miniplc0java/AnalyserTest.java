@@ -13,8 +13,8 @@ import java.util.Scanner;
 import static org.junit.Assert.*;
 
 public class AnalyserTest {
-    private Analyser init(){
-        File file = new File("C:\\Users\\hp\\IdeaProjects\\miniplc0-java-master\\src\\test\\java\\miniplc0java\\test.txt");
+    private Analyser init(String path){
+        File file = new File(path);
         Scanner sc = null;
         try {
             sc = new Scanner(file);
@@ -26,9 +26,18 @@ public class AnalyserTest {
         return new Analyser(tokenizer);
     }
 
-    @Test
-    public void testAnalyser() throws CompileError {
-        Analyser analyser = init();
-        System.out.println(analyser.analyse());
+    private void testAnalyser(String path) throws CompileError {
+        Analyser analyser = init("C:\\Users\\hp\\IdeaProjects\\miniplc0-java-master\\src\\test\\java\\miniplc0java\\"+path);
+        System.out.println(analyser.analyse().toString().replaceAll("[,\\[\\]]","\n"));
     }
+    @Test
+    public void test1() throws CompileError {
+        testAnalyser("test1.txt");
+    }
+
+    @Test
+    public void test2() throws CompileError {
+        testAnalyser("test2.txt");
+    }
+
 }
