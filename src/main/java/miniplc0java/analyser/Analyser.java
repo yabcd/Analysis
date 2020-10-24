@@ -217,6 +217,7 @@ public final class Analyser {
         while (nextIf(TokenType.Const) != null) {
             // 变量名
             var nameToken = expect(TokenType.Ident);
+            instructions.add(new Instruction(Operation.LIT,0));
 
             // 等于号
             expect(TokenType.Equal);
@@ -231,7 +232,6 @@ public final class Analyser {
             //
 
             //增加指令
-            instructions.add(new Instruction(Operation.LIT,0));
             instructions.add(new Instruction(Operation.STO,getOffset(nameToken.getValueString(),nameToken.getStartPos())));
         }
     }
