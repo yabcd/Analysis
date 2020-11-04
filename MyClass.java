@@ -84,9 +84,9 @@ public class MyClass {
             case '#':
                 return 0;
         }
-        //throw new RuntimeException("this vt does not exist");
-        System.out.println("error:"+s);
-        return 0;
+        throw new RuntimeException("this vt does not exist");
+//        System.out.println("error:"+s);
+//        return 0;
     }
 
     public int g(char s) {
@@ -104,15 +104,14 @@ public class MyClass {
             case '#':
                 return -1;
         }
-        //throw new RuntimeException("this vt does not exist");
-        System.out.println("error:"+s);
-        return 0;
+        throw new RuntimeException("this vt does not exist");
     }
 
     public Integer compare(char s1, char s2) {
         if (s1 == 'i' && (s2 == 'i' || s2 == '(')) return null;
         if (s1 == ')' && (s2 == 'i' || s2 == '(')) return null;
         if (s1 == '#' && (s2 == ')' || s2 == '#')) return null;
+        if(!isVt(s2)) return null;
         return f(s1) - g(s2);
     }
 
