@@ -117,7 +117,7 @@ public class MyClass {
 
     public static void main(String[] args) throws FileNotFoundException {
         MyClass myClass = new MyClass();
-        Scanner sc = new Scanner(new File("C:\\Users\\hp\\IdeaProjects\\analyse\\test1.txt"));
+        Scanner sc = new Scanner(new File(args[0]));
         while (sc.hasNext()) {
             myClass.analyseLine((sc.nextLine() + "#").toCharArray());
         }
