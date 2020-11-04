@@ -27,28 +27,26 @@ public class MyClass {
                     if ((x = getvtIndex(stack, fsp)) == -1) break;
                 }
                 if ((x = getvtIndex(stack, fsp)) != -1) fsp = x;
-                rule(stack, fsp, sp);
+                if(rule(stack, fsp, sp)==-1) {
+                    System.out.println("RE");
+                    return 0;
+                }
+                System.out.println("R");
                 sp = fsp + 2;
                 stack[sp - 1] = 'N';
-//                for(int i=0;i<sp;i++){
-//                    System.out.print(" "+stack[i]);
-//                }
-//                System.out.println();
             }
         }
         return 0;
     }
 
-    public void rule(char[] stack, int fsp, int sp) {
+    public int rule(char[] stack, int fsp, int sp) {
         if (sp - fsp == 4) {
-            System.out.println("R");
         } else if (sp - fsp == 2) {
             if (stack[sp - 1] != 'i')
-                System.out.println("RE");
-            else
-                System.out.println("R");
+                return -1;
         } else
-            System.out.println("RE");
+            return -1;
+        return 1;
     }
 
     public int getvtIndex(char[] stack, int sp) {
@@ -86,7 +84,9 @@ public class MyClass {
             case '#':
                 return 0;
         }
-        throw new RuntimeException("this vt does not exist");
+        //throw new RuntimeException("this vt does not exist");
+        System.out.println("error:"+s);
+        return 0;
     }
 
     public int g(char s) {
@@ -102,14 +102,15 @@ public class MyClass {
             case 'i':
                 return 5;
             case '#':
-                return 0;
+                return -1;
         }
-        throw new RuntimeException("this vt does not exist");
+        //throw new RuntimeException("this vt does not exist");
+        System.out.println("error:"+s);
+        return 0;
     }
 
     public Integer compare(char s1, char s2) {
         if (s1 == 'i' && (s2 == 'i' || s2 == '(')) return null;
-        if (s1 == '(' && s2 == '#') return null;
         if (s1 == ')' && (s2 == 'i' || s2 == '(')) return null;
         if (s1 == '#' && (s2 == ')' || s2 == '#')) return null;
         return f(s1) - g(s2);
@@ -118,6 +119,7 @@ public class MyClass {
     public static void main(String[] args) throws FileNotFoundException {
         MyClass myClass = new MyClass();
         Scanner sc = new Scanner(new File(args[0]));
+        //Scanner sc = new Scanner(new File("C:\\Users\\hp\\IdeaProjects\\analyse\\test1.txt"));
         while (sc.hasNext()) {
             myClass.analyseLine((sc.nextLine() + "#").toCharArray());
         }
