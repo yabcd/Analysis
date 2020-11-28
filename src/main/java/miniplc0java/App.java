@@ -108,8 +108,9 @@ public class App {
                 output.println(instruction.toString());
             }
         } else {
-            System.err.println("Please specify either '--analyse' or '--tokenize'.");
-            System.exit(3);
+            output.println(scanner.useDelimiter("$").next());
+//            System.err.println("Please specify either '--analyse' or '--tokenize'.");
+//            System.exit(3);
         }
     }
 

@@ -16,11 +16,6 @@ public class Instruction {
         this.x = x;
     }
 
-    public Instruction() {
-        this.opt = Operation.LIT;
-        this.x = 0;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -55,19 +50,20 @@ public class Instruction {
     @Override
     public String toString() {
         switch (this.opt) {
-            case ADD:
-            case DIV:
-            case ILL:
-            case MUL:
-            case SUB:
-            case WRT:
-                return String.format("%s", this.opt);
-            case LIT:
-            case LOD:
-            case STO:
-                return String.format("%s %s", this.opt, this.x);
-            default:
-                return "ILL";
+//            case ADD:
+//            case DIV:
+//            case ILL:
+//            case MUL:
+//            case SUB:
+//            case WRT:
+//                return String.format("%s", this.opt);
+//            case LIT:
+//            case LOD:
+//            case STO:
+//                return String.format("%s %s", this.opt, this.x);
+//            default:
+//                return "ILL";
         }
+        return "";
     }
 }

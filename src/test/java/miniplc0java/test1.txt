@@ -1,6 +1,2 @@
-begin
-    const PI = 314;
-    var a;
-    a = PI*10*10-0/5;
-    print(a);
-end
+let a:int=5;
+const b:int=6;
