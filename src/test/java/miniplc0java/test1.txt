@@ -1,6 +1,15 @@
 let a:int = 1;
 fn fib(i:int) -> int{
-    return i;
+    let b:int = 1;
+    let c:int = 1;
+    let d:int = 1;
+    while(b<1){
+        let e:int = 1;
+    }
+    if(b<1){
+        let f:int = 1;
+    }
+    return 1;
 }
 fn main() -> int {
     while(a>1){

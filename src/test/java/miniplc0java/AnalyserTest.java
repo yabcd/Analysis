@@ -29,10 +29,13 @@ public class AnalyserTest {
 
     private void testAnalyser(String path) throws CompileError {
         Analyser analyser = init("C:\\Users\\hp\\IdeaProjects\\miniplc0-java-master\\src\\test\\java\\miniplc0java\\"+path);
-        byte[] bytes = analyser.analyse().getBytes();
+        o0 analyse = analyser.analyse();
+        byte[] bytes = analyse.getBytes();
         for(byte b:bytes){
             System.out.print(Integer.toHexString(Integer.valueOf(b))+" ");
         }
+        System.out.println(analyse.getGlobals());
+        System.out.println(analyse.getFunctions());
     }
     @Test
     public void test1() throws CompileError {
