@@ -1,2 +1,21 @@
-let a:int=5;
-const b:int=6;
+fn fib(x: int,y:int) -> int {
+    let b:int=1;
+    let c:int=1;
+    if x<=1 {
+        return 1;
+    }
+    let abc:int = fib(x - 1,2);
+    let result: int =-(b-c) * abc;
+    result = -b+result + fib(x - 2,2);
+    result = getint();
+    return result;
+}
+fn main() -> int {
+    let i: int = 0;
+    let j: int;
+    while i < j {
+        fib(1,2);
+        i = i + 1;
+    }
+    return 0;
+}

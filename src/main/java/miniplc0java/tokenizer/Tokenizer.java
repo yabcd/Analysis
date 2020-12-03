@@ -39,7 +39,12 @@ public class Tokenizer {
             return lexChar();
         }
         else {
-            return lexOperatorOrUnknown();
+            Token token = lexOperatorOrUnknown();
+            if(it.peekChar()=='/'&&token.getTokenType()==TokenType.Div){
+                while(it.nextChar()!='\n');
+                return nextToken();
+            }
+            return token;
         }
     }
 

@@ -1,37 +1,87 @@
 package miniplc0java.symboltable;
 
 import miniplc0java.error.AnalyzeError;
+import miniplc0java.error.CompileError;
 import miniplc0java.error.ErrorCode;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.util.Pos;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class SymbolTableUtil {
-    private SymbolTable currentTable = new SymbolTable(null);
-    public void addSymbol(String name, TokenType type, boolean isInitialized, boolean isConstant, Pos curPos) throws AnalyzeError {
-        currentTable.addSymbol(name,type,isInitialized,isConstant,curPos);
+    private SymbolTable currentTable;
+    private SymbolTable rootTable;
+
+    public HashMap<String, SymbolEntry> getRootMap() {
+        return rootTable.getMap();
     }
+
+    public SymbolEntry getSymbolEntry(String name, Pos curPos) throws AnalyzeError {
+        SymbolTable temp = currentTable;
+        while (temp != null) {
+            SymbolEntry entry = temp.getMap().get(name);
+            if (entry != null) return entry;
+            temp = temp.getParent();
+        }
+        throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
+    }
+
+    //递归获取变量偏移
+    public int getOffset(String name, Pos curPos) throws AnalyzeError {
+        return this.getSymbolEntry(name, curPos).getStackOffset();
+    }
+
+    public TokenType getType(String name, Pos curPos) throws AnalyzeError {
+        return this.getSymbolEntry(name, curPos).getType();
+    }
+
+    public int getCurrentSize() {
+        return currentTable.getMap().size();
+    }
+
+    public SymbolTableUtil() {
+        currentTable = new SymbolTable(null);
+        rootTable = currentTable;
+    }
+
+    public void addSymbol(String name, TokenType type, boolean isInitialized, boolean isConstant, Pos curPos) throws AnalyzeError {
+        currentTable.addSymbol(name, type, isInitialized, isConstant, curPos);
+    }
+
+    public void addParam(String name, TokenType type, boolean isConstant, Pos curPos, int offset) throws AnalyzeError {
+        currentTable.addParam(name, type, isConstant, curPos, offset);
+    }
+
+    public void addFunction(String name, TokenType returnType, List<TokenType> params, Pos curPos) throws AnalyzeError {
+        rootTable.addFunction(name, params, returnType, curPos);
+    }
+
     public void declareSymbol(String name, Pos curPos) throws AnalyzeError {
         currentTable.declareSymbol(name, curPos);
     }
-    public int getOffset(String name, Pos curPos) throws AnalyzeError {
-        return currentTable.getOffset(name,curPos);
+
+    public int getGlobalOffset(String name, Pos curPos) throws AnalyzeError {
+        return rootTable.getOffset(name, curPos);
     }
+
     public boolean isConstant(String name, Pos curPos) throws AnalyzeError {
         return currentTable.isConstant(name, curPos);
     }
-    public void deleteCurrentTable(){
-        currentTable=currentTable.getParent();
+
+    public void deleteCurrentTable() {
+        currentTable = currentTable.getParent();
     }
-    public void createTable(boolean ifBlock){
-        if(ifBlock){
-            currentTable = new SymbolTable(currentTable,currentTable.getNextOffset());
-        }else{
+
+    public void createTable(boolean ifBlock) {
+        if (ifBlock) {
+            currentTable = new SymbolTable(currentTable, currentTable.getNextOffset());
+        } else {
             currentTable = new SymbolTable(currentTable);
         }
     }
 }
+
 class SymbolTable {
     /**
      * 符号表
@@ -48,6 +98,20 @@ class SymbolTable {
 
     private HashMap<String, SymbolEntry> symbolTable = new HashMap<>();
 
+    public HashMap<String, SymbolEntry> getMap() {
+        return symbolTable;
+    }
+
+    public SymbolEntry getSymbolEntry(String name, Pos curPos) throws AnalyzeError {
+        var entry = this.symbolTable.get(name);
+        if (entry == null) {
+            throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
+        } else {
+            return entry;
+        }
+    }
+
+
     /**
      * 下一个变量的栈偏移
      */
@@ -61,7 +125,7 @@ class SymbolTable {
         this.parent = parent;
     }
 
-    public SymbolTable(SymbolTable parent,int nextOffset) {
+    public SymbolTable(SymbolTable parent, int nextOffset) {
         this.parent = parent;
         this.nextOffset = nextOffset;
     }
@@ -89,6 +153,14 @@ class SymbolTable {
             throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
         } else {
             this.symbolTable.put(name, new SymbolEntry(type, isConstant, isInitialized, getNextVariableOffset()));
+        }
+    }
+
+    public void addFunction(String name, List<TokenType> params, TokenType returnType, Pos curPos) throws AnalyzeError {
+        if (this.symbolTable.get(name) != null) {
+            throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
+        } else {
+            this.symbolTable.put(name, new SymbolEntry(TokenType.Fn, returnType, getNextVariableOffset(), params));
         }
     }
 
@@ -142,5 +214,12 @@ class SymbolTable {
         }
     }
 
+    public void addParam(String name, TokenType type, boolean isConstant, Pos curPos, int offset) throws AnalyzeError {
+        if (this.symbolTable.get(name) != null) {
+            throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
+        } else {
+            this.symbolTable.put(name, new SymbolEntry(type, isConstant, true, offset));
+        }
+    }
 }
 
