@@ -62,6 +62,8 @@ public class TokenizerTest {
 
     @Test
     public void hexTest(){
-        System.out.println(Integer.valueOf('f'));
+        byte b = -1;
+        System.out.println(Integer.toHexString(Integer.valueOf(b)));
+        System.out.println(Integer.valueOf("0a",16));
     }
 }

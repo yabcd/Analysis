@@ -13,6 +13,7 @@ import java.util.Scanner;
 import miniplc0java.analyser.Analyser;
 import miniplc0java.error.CompileError;
 import miniplc0java.instruction.Instruction;
+import miniplc0java.program.o0;
 import miniplc0java.tokenizer.StringIter;
 import miniplc0java.tokenizer.Token;
 import miniplc0java.tokenizer.TokenType;
@@ -95,18 +96,16 @@ public class App {
         } else if (result.getBoolean("analyse")) {
             // analyze
             var analyzer = new Analyser(tokenizer);
-            List<Instruction> instructions;
+            o0 program;
             try {
-                instructions = analyzer.analyse();
+                program = analyzer.analyse();
             } catch (Exception e) {
                 // 遇到错误不输出，直接退出
                 System.err.println(e);
                 System.exit(0);
                 return;
             }
-            for (Instruction instruction : instructions) {
-                output.println(instruction.toString());
-            }
+            output.writeBytes(program.getBytes());
         } else {
             output.println(scanner.useDelimiter("$").next());
 //            System.err.println("Please specify either '--analyse' or '--tokenize'.");

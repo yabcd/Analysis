@@ -2,6 +2,7 @@ package miniplc0java;
 
 import miniplc0java.analyser.Analyser;
 import miniplc0java.error.CompileError;
+import miniplc0java.program.o0;
 import miniplc0java.tokenizer.StringIter;
 import miniplc0java.tokenizer.Tokenizer;
 import org.junit.Test;
@@ -28,7 +29,10 @@ public class AnalyserTest {
 
     private void testAnalyser(String path) throws CompileError {
         Analyser analyser = init("C:\\Users\\hp\\IdeaProjects\\miniplc0-java-master\\src\\test\\java\\miniplc0java\\"+path);
-        System.out.println(analyser.analyse().toString().replaceAll("[,\\[\\]]","\n"));
+        byte[] bytes = analyser.analyse().getBytes();
+        for(byte b:bytes){
+            System.out.print(Integer.toHexString(Integer.valueOf(b))+" ");
+        }
     }
     @Test
     public void test1() throws CompileError {

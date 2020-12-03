@@ -2,11 +2,12 @@ package miniplc0java.program;
 
 import miniplc0java.symboltable.SymbolEntry;
 import miniplc0java.tokenizer.TokenType;
+import miniplc0java.util.ByteUtil;
 
 import java.util.Arrays;
 
 public class GlobalDef implements Comparable<GlobalDef>{
-    private boolean is_const;
+    private boolean is_const;//u8
     private int[] value;
     int offset;
 
@@ -45,5 +46,15 @@ public class GlobalDef implements Comparable<GlobalDef>{
     @Override
     public int compareTo(GlobalDef o) {
         return this.offset - o.offset;
+    }
+
+    public byte[] getBytes(){
+        byte[] bytes= new byte[5+value.length];
+        bytes[0] = (byte)((is_const)?1:0);
+        ByteUtil.addInt(bytes,1,value.length);
+        for(int i =0;i<value.length;i++){
+            bytes[i+5] = (byte)value[i];
+        }
+        return bytes;
     }
 }

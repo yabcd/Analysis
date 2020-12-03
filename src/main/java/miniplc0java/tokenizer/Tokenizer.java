@@ -151,9 +151,9 @@ public class Tokenizer {
             }
             return new Token(TokenType.Double,value,start,it.currentPos());
         }
-        Integer value = 0;
+        Long value = 0L;
         try{
-             value = Integer.valueOf(sb.toString());
+             value = Long.valueOf(sb.toString());
         }catch (Exception e){
             throw new TokenizeError(ErrorCode.IntegerOverflow,start);
         }

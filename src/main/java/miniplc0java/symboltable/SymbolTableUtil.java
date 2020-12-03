@@ -26,6 +26,18 @@ public class SymbolTableUtil {
         }
         throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
     }
+    public boolean isGlobal(String name, Pos curPos) throws AnalyzeError {
+        SymbolTable temp = currentTable;
+        while (temp != null) {
+            SymbolEntry entry = temp.getMap().get(name);
+            if (entry != null) {
+                if(temp.getParent()==null) return true;
+                return false;
+            }
+            temp = temp.getParent();
+        }
+        throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
+    }
 
     //递归获取变量偏移
     public int getOffset(String name, Pos curPos) throws AnalyzeError {
