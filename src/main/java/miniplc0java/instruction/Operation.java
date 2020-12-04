@@ -32,7 +32,7 @@ public enum Operation {
             case LOAD8:
                 return "10";
             case LOAD16:
-                return "11,";
+                return "11";
             case LOAD32:
                 return "12";
             case LOAD64:
@@ -86,7 +86,7 @@ public enum Operation {
             case CMPU:
                 return "31";
             case NEGI:
-                return "34,";
+                return "34";
             case NEGF:
                 return "35";
             case ITOF:

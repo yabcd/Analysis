@@ -447,9 +447,8 @@ public final class Analyser {
         TokenType type= analyseType();
         symbolTable.addSymbol(ident.getValueString(),type,false,false,ident.getStartPos());
 
-        getVariableAddr(ident);
-
         if (nextIf(TokenType.Assign) != null) {
+            getVariableAddr(ident);
             analyseExpression();
             symbolTable.declareSymbol(ident.getValueString(),peek().getStartPos());
             instructions.add(new Instruction(Operation.STORE64));
