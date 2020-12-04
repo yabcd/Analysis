@@ -315,13 +315,14 @@ public final class Analyser {
 
 
 
+        symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
+
         while (check(TokenType.Fn)) {
             analyseFunction();
         }
         expect(TokenType.EOF);
 
         //添加_start符号表
-        symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
         SymbolEntry main = symbolTable.getSymbolEntry("main", peek.getStartPos());
         TokenType returnType = main.getReturnType();
         int return_slot = 0;
