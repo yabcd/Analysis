@@ -1,10 +1,15 @@
-let j:int;
-fn foo(i:int,j:int) -> int {
-    i=10;
-    j=10;
-    return 0;
+fn foo()->int{
+    return 5;
 }
+
 fn main()->int{
-    foo(1,2);
-    return 0;
+    let i:int=-1+2*(3+1);
+    if(i>=5){
+
+    }
+    let j:int;
+    j= 12;
+    let d:double = j as double;
+    j = foo();
+    return j;
 }
