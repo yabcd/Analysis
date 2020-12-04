@@ -1,34 +1,10 @@
 let j:int;
-fn foo() -> int {
-return 1;
+fn foo(i:int,j:int) -> int {
+    i=10;
+    j=10;
+    return 0;
 }
-fn vo() -> void{
-    return;
-}
-fn main() -> int {
-    let i:int = 5;
-    if i > 1 {
-        return 1;
-    }
-    if i < 2 {
-        return 1;
-    }
-    if i >= 3 {
-        return 1;
-    }
-    if i <= 4 {
-        return 1;
-    }
-    if i != -5+6 {
-        return 1;
-    }
-    if i == 6 {
-        return 1;
-    }
-    j = 5;
-    let k:double = 5.1;
-    if k > 2.5 {
-    }
-    k = foo() as double;
-    return 1+5+26+4;
+fn main()->int{
+    foo(1,2);
+    return 0;
 }

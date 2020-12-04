@@ -113,7 +113,7 @@ public final class Analyser {
 //        if(checkOperator(vtToken)>4) throw new AnalyzeError(ErrorCode.UnExpectedToken,token.getStartPos());
         //栈内优先级
         int y = checkOperator(vtToken);
-        while(vtToken!=null&&x<y){
+        while(vtToken!=null&&x<=y&&y!=0){
             //进行一次运算
             analyseOperator();
 
@@ -694,6 +694,7 @@ public final class Analyser {
     private void getVariableAddr(String name, Pos curPos) throws AnalyzeError {
         int offset = symbolTable.getOffset(name, curPos);
         if(offset<0){
+            if(curReturnType==TokenType.Void) offset++;
             instructions.add(new Instruction(Operation.ARGA,Long.valueOf(-offset)));
             return;
         }
