@@ -311,11 +311,8 @@ public final class Analyser {
         }
 
         globalInstructions = new ArrayList<>(instructions);
-        program.getFunctions().add(new FunctionDef(0, 0, 0, 0, globalInstructions));
-
-
-
-        symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
+        FunctionDef startFun = new FunctionDef(-1, 0, 0, 0, globalInstructions);
+        program.getFunctions().add(startFun);
 
         while (check(TokenType.Fn)) {
             analyseFunction();
@@ -323,6 +320,8 @@ public final class Analyser {
         expect(TokenType.EOF);
 
         //添加_start符号表
+        symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
+        startFun.setName(symbolTable.getGlobalOffset("_start",peek.getStartPos()));
         SymbolEntry main = symbolTable.getSymbolEntry("main", peek.getStartPos());
         TokenType returnType = main.getReturnType();
         int return_slot = 0;

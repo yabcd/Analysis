@@ -7,6 +7,11 @@ import java.util.ArrayList;
 
 public class FunctionDef {
     int name;
+
+    public void setName(int name) {
+        this.name = name;
+    }
+
     int return_slots;
     int param_slots;
     int loc_slots;
