@@ -1,8 +1,9 @@
-fn fib(i:int)->int{
-    return 0;
+fn fib(i:int,j:int)->int{
+    i=10;
+    j = 0;
+    return j;
 }
+
 fn main()->int{
-    let i:int = 1;
-    i = fib(1);
-    return 0;
+    return fib(12,12);
 }

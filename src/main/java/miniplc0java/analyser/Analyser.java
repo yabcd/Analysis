@@ -394,7 +394,7 @@ public final class Analyser {
         Token ident = expect(TokenType.Ident);
         expect(TokenType.Colon);
         TokenType parmType = analyseType();
-        symbolTable.addParam(ident.getValueString(),parmType,isConst,ident.getStartPos(),index);
+        symbolTable.addParam(ident.getValueString(),parmType,isConst,ident.getStartPos(),index+1);
         return parmType;
     }
 
@@ -548,6 +548,7 @@ public final class Analyser {
             instructions.add(new Instruction(Operation.ARGA,0L));
             Token peek = peek();
             TokenType tokenType = analyseExpression();
+            if(tokenType == TokenType.Ident) tokenType = TokenType.Uint;
             if(tokenType!=curReturnType){
                 throw new AnalyzeError(ErrorCode.TypeMismatch,peek.getStartPos());
             }

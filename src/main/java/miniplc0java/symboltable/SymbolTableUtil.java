@@ -70,7 +70,7 @@ public class SymbolTableUtil {
     }
 
     public void addParam(String name, TokenType type, boolean isConstant, Pos curPos, int offset) throws AnalyzeError {
-        currentTable.addParam(name, type, isConstant, curPos, offset);
+        currentTable.addParam(name, type, isConstant, curPos, -offset);
     }
 
     public void addFunction(String name, TokenType returnType, List<TokenType> params, Pos curPos) throws AnalyzeError {
