@@ -16,7 +16,6 @@ import miniplc0java.tokenizer.Token;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.tokenizer.Tokenizer;
 import miniplc0java.util.Pos;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.*;
 
@@ -38,6 +37,10 @@ public final class Analyser {
      * 当前偷看的 token
      */
     Token peekedToken = null;
+
+    //当前函数是否返回，返回类型
+    Boolean ifReturn = false;
+    TokenType curReturnType;
 
 
     /**
@@ -301,22 +304,33 @@ public final class Analyser {
     }
 
     private void analyseProgram() throws CompileError {
+        Token peek = peek();
         while (check(TokenType.Let)||check(TokenType.Const)) {
             if(check(TokenType.Let)) analyseLetStatement();
             else analyseConstStatement();
         }
 
-        globalInstructions = instructions;
-        //添加_start符号表
-        symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
-        int name = symbolTable.getGlobalOffset("_start", peekedToken.getStartPos());
-        program.getFunctions().add(new FunctionDef(name, 0, 0, 0, instructions));
+        globalInstructions = new ArrayList<>(instructions);
+        program.getFunctions().add(new FunctionDef(0, 0, 0, 0, globalInstructions));
+
+
 
         while (check(TokenType.Fn)) {
             analyseFunction();
         }
         expect(TokenType.EOF);
 
+        //添加_start符号表
+        symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
+        SymbolEntry main = symbolTable.getSymbolEntry("main", peek.getStartPos());
+        TokenType returnType = main.getReturnType();
+        int return_slot = 0;
+        if(returnType!=TokenType.Void) return_slot=1;
+        globalInstructions.add(new Instruction(Operation.STACKALLOC,Long.valueOf(return_slot)));
+        int offset = symbolTable.getGlobalOffset("main",peek.getStartPos());
+        int funID = program.getFunctions().indexOf(new FunctionDef(offset));
+        globalInstructions.add(new Instruction(Operation.CALL,Long.valueOf(funID)));
+        if(return_slot==1) globalInstructions.add(new Instruction(Operation.POP));
         //根据全局符号表生成全局变量列表
         List<GlobalDef> globals = program.getGlobals();
         HashMap<String, SymbolEntry> rootMap = symbolTable.getRootMap();
@@ -328,6 +342,7 @@ public final class Analyser {
     }
 
     private void analyseFunction() throws CompileError {
+        ifReturn = false;
         //进入新的作用域
         symbolTable.createTable(false);
 
@@ -340,20 +355,25 @@ public final class Analyser {
         expect(TokenType.RParen);
         expect(TokenType.Arrow);
         TokenType returnType = analyseType();
+        curReturnType = returnType;
         //添加符号表
         symbolTable.addFunction(funName.getValueString(),returnType,params,funName.getStartPos());
 
         //添加函数列表
         instructions = new ArrayList<>();
-        analyseBlockStatement();
         String nameValueString = funName.getValueString();
         int name = symbolTable.getGlobalOffset(nameValueString,funName.getStartPos());
         int return_slots = (funName.getTokenType()==TokenType.Void)?0:1;
         int param_slots = params.size();
         int loc_slots = symbolTable.getCurrentSize()-param_slots;
         program.getFunctions().add(new FunctionDef(name,return_slots,param_slots,loc_slots,instructions));
+
+        analyseBlockStatement();
         //退出作用域
         symbolTable.deleteCurrentTable();
+        if(!ifReturn&&curReturnType!=TokenType.Void){
+            throw new AnalyzeError(ErrorCode.NotAllRoutesReturn,funName.getStartPos());
+        }
     }
 
     private void analyseFunctionParmList(List<TokenType> params) throws CompileError {
@@ -379,12 +399,13 @@ public final class Analyser {
     }
 
     private void analyseStatement() throws CompileError {
+        TokenType returnType = null;
         TokenType peek = peek().getTokenType();
         switch (peek) {
             case If -> analyseIfStatement();
             case While -> analyseWhileStatement();
-            case Return -> analyseReturnStatement();
-            case LBrace -> analyseBlockStatement();
+            case Return ->  analyseReturnStatement();
+            case LBrace ->  analyseBlockStatement();
             case Semicolon -> analyseEmptyStatement();
             case Let -> analyseLetStatement();
             case Const -> analyseConstStatement();
@@ -410,6 +431,9 @@ public final class Analyser {
             }
             if(type.equals("double")){
                 return TokenType.Double;
+            }
+            if(type.equals("void")){
+                return TokenType.Void;
             }
         }
         throw new AnalyzeError(ErrorCode.InvalidType, peek().getStartPos());
@@ -465,6 +489,11 @@ public final class Analyser {
         instructions.add(ifBlockLength);
         int size1 = instructions.size();
         analyseBlockStatement();
+        Boolean ifBlockReturn = false;
+        if(ifReturn){//if分支可以返回
+            ifReturn = false;
+            ifBlockReturn = true;
+        }
         ifBlockLength.setX(Long.valueOf(instructions.size()-size1+1));
         if (check(TokenType.Else)) {
             expect(TokenType.Else);
@@ -478,6 +507,12 @@ public final class Analyser {
                 ifBlockLength.setX(Long.valueOf(instructions.size()-size+1));
                 instructions.add(new Instruction(Operation.BR,0L));
             }
+        }else{
+            ifReturn = true;
+        }
+        if(ifBlockReturn&&ifReturn){
+        }else{
+            ifReturn = false;
         }
     }
 
@@ -507,17 +542,20 @@ public final class Analyser {
     }
 
     //return语句
-    private TokenType analyseReturnStatement() throws CompileError {
+    private void analyseReturnStatement() throws CompileError {
         expect(TokenType.Return);
-        TokenType tokenType = null;
         if (!check(TokenType.Semicolon)) {
             instructions.add(new Instruction(Operation.ARGA,0L));
-            tokenType = analyseExpression();
+            Token peek = peek();
+            TokenType tokenType = analyseExpression();
+            if(tokenType!=curReturnType){
+                throw new AnalyzeError(ErrorCode.TypeMismatch,peek.getStartPos());
+            }
             instructions.add(new Instruction(Operation.STORE64));
         }
         instructions.add(new Instruction(Operation.RET));
         expect(TokenType.Semicolon);
-        return tokenType;
+        ifReturn = true;
     }
 
     private void analyseIdentExpression() throws CompileError{
@@ -559,6 +597,11 @@ public final class Analyser {
             symbolEntry= symbolTable.getSymbolEntry(ident.getValueString(), ident.getStartPos());
             List params = symbolEntry.getParams();
             TokenType returnType = symbolEntry.getReturnType();
+
+            int return_slot = 0;
+            if(returnType!=TokenType.Void) return_slot=1;
+            instructions.add(new Instruction(Operation.STACKALLOC,Long.valueOf(return_slot)));
+
             int index = 0;
             if(!check(TokenType.RParen)){
                 TokenType eType = analyseExpression();
@@ -574,7 +617,7 @@ public final class Analyser {
             expect(TokenType.RParen);
             ident.setTokenType(returnType);
             int offset = symbolTable.getGlobalOffset(ident.getValueString(),ident.getStartPos());
-            if(symbolEntry.isConstant()){
+            if(symbolEntry.isConstant()){//是标准库
                 instructions.add(new Instruction(Operation.CALLNAME,Long.valueOf(offset)));
             }else{
                 int funID = program.getFunctions().indexOf(new FunctionDef(offset));
@@ -593,11 +636,17 @@ public final class Analyser {
             analyseIdentExpression();
         } else if (check(TokenType.Uint) || check(TokenType.Double) || check(TokenType.String)) {
             Token next = next();
-            pushToken(next);
             if(next.getTokenType()==TokenType.Uint) instructions.add(new Instruction(Operation.PUSH,(Long)next.getValue()));
             else if(next.getTokenType()==TokenType.Double) {
                 instructions.add(new Instruction(Operation.PUSH,Double.doubleToRawLongBits((Double) next.getValue())));
+            }else{
+                int offset = symbolTable.addEmptyGlobalEntry();
+                program.getGlobals().add(new GlobalDef(offset,next.getValueString()));
+                instructions.add(new Instruction(Operation.PUSH,Long.valueOf(offset)));
+                next.setTokenType(TokenType.Uint);
+                next.setValue(offset);
             }
+            pushToken(next);
         } else if (check(TokenType.LParen)) {
             Token LParen = expect(TokenType.LParen);
             operator.add(new Token(TokenType.Semicolon,peek()));

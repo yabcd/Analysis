@@ -63,7 +63,7 @@ public class Instruction {
 
     public byte[] getBytes(){
         byte[] bytes = null;
-        int code = Integer.valueOf(this.opt.toString(),16);
+        int code = Integer.valueOf(this.opt.getBytes(),16);
         if(opt== Operation.PUSH){
             bytes = new byte[9];
             ByteUtil.addInt(bytes,1,(int)(x>>32));

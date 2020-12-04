@@ -11,8 +11,7 @@ public enum Operation {
     CALL, RET, CALLNAME, SCANI, SCANF, PRINTI, PRINTC, PRINTF,
     PRINTS, PRINTLN, PANIC;
 
-    @Override
-    public String toString() {
+    public String getBytes() {
         switch (this) {
             case NOP:
                 return "00";
@@ -133,125 +132,125 @@ public enum Operation {
         }
     }
 
-//    @Override
-//    public String toString() {
-//        switch (this) {
-//            case NOP:
-//                return "NOP";
-//            case PUSH:
-//                return "PUSH";
-//            case POP:
-//                return "POP";
-//            case POPN:
-//                return "POPN";
-//            case DUP:
-//                return "DUP:";
-//            case LOCA:
-//                return "LOCA";
-//            case ARGA:
-//                return "ARGA";
-//            case GLOBA:
-//                return "GLOBA";
-//            case LOAD8:
-//                return "LOAD8";
-//            case LOAD16:
-//                return "LOAD16,";
-//            case LOAD32:
-//                return "LOAD32";
-//            case LOAD64:
-//                return "LOAD64";
-//            case STORE8:
-//                return "STORE8";
-//            case STORE16:
-//                return "STORE16";
-//            case STORE32:
-//                return "STORE32";
-//            case STORE64:
-//                return "STORE64";
-//            case ALLOC:
-//                return "ALLOC";
-//            case FREE:
-//                return "FREE";
-//            case STACKALLOC:
-//                return "STACKALLOC";
-//            case ADDI:
-//                return "ADDI";
-//            case SUBI:
-//                return "SUBI";
-//            case MULI:
-//                return "MULI";
-//            case DIVI:
-//                return "DIVI";
-//            case ADDF:
-//                return "ADDF";
-//            case SUBF:
-//                return "SUBF";
-//            case MULF:
-//                return "MULF";
-//            case DIVF:
-//                return "DIVF";
-//            case DIVU:
-//                return "DIVU";
-//            case SHR:
-//                return "SHR";
-//            case AND:
-//                return "AND";
-//            case OR:
-//                return "OR";
-//            case XOR:
-//                return "XOR";
-//            case NOT:
-//                return "NOT";
-//            case CMPI:
-//                return "CMPI";
-//            case CMPF:
-//                return "CMPF";
-//            case CMPU:
-//                return "CMPU";
-//            case NEGI:
-//                return "NEGI,";
-//            case NEGF:
-//                return "NEGF";
-//            case ITOF:
-//                return "ITOF";
-//            case FTOI:
-//                return "FTOI";
-//            case SHRL:
-//                return "SHRL";
-//            case SETLT:
-//                return "SETLT";
-//            case SETGT:
-//                return "SETGT";
-//            case BR:
-//                return "BR";
-//            case BRFALSE:
-//                return "BRFALSE";
-//            case BRTRUE:
-//                return "BRTRUE";
-//            case CALL:
-//                return "CALL";
-//            case RET:
-//                return "RET";
-//            case CALLNAME:
-//                return "CALLNAME";
-//            case SCANI:
-//                return "SCANI";
-//            case SCANF:
-//                return "SCANF";
-//            case PRINTI:
-//                return "PRINTI";
-//            case PRINTC:
-//                return "PRINTC";
-//            case PRINTF:
-//                return "PRINTF,";
-//            case PRINTS:
-//                return "PRINTS";
-//            case PRINTLN:
-//                return "PRINTLN";
-//            case PANIC:
-//                return "PANIC";
-//            default:
-//                return "InvalidOperation";
-//        }
-//    }
+    @Override
+    public String toString() {
+        switch (this) {
+            case NOP:
+                return "NOP";
+            case PUSH:
+                return "PUSH";
+            case POP:
+                return "POP";
+            case POPN:
+                return "POPN";
+            case DUP:
+                return "DUP:";
+            case LOCA:
+                return "LOCA";
+            case ARGA:
+                return "ARGA";
+            case GLOBA:
+                return "GLOBA";
+            case LOAD8:
+                return "LOAD8";
+            case LOAD16:
+                return "LOAD16,";
+            case LOAD32:
+                return "LOAD32";
+            case LOAD64:
+                return "LOAD64";
+            case STORE8:
+                return "STORE8";
+            case STORE16:
+                return "STORE16";
+            case STORE32:
+                return "STORE32";
+            case STORE64:
+                return "STORE64";
+            case ALLOC:
+                return "ALLOC";
+            case FREE:
+                return "FREE";
+            case STACKALLOC:
+                return "STACKALLOC";
+            case ADDI:
+                return "ADDI";
+            case SUBI:
+                return "SUBI";
+            case MULI:
+                return "MULI";
+            case DIVI:
+                return "DIVI";
+            case ADDF:
+                return "ADDF";
+            case SUBF:
+                return "SUBF";
+            case MULF:
+                return "MULF";
+            case DIVF:
+                return "DIVF";
+            case DIVU:
+                return "DIVU";
+            case SHR:
+                return "SHR";
+            case AND:
+                return "AND";
+            case OR:
+                return "OR";
+            case XOR:
+                return "XOR";
+            case NOT:
+                return "NOT";
+            case CMPI:
+                return "CMPI";
+            case CMPF:
+                return "CMPF";
+            case CMPU:
+                return "CMPU";
+            case NEGI:
+                return "NEGI,";
+            case NEGF:
+                return "NEGF";
+            case ITOF:
+                return "ITOF";
+            case FTOI:
+                return "FTOI";
+            case SHRL:
+                return "SHRL";
+            case SETLT:
+                return "SETLT";
+            case SETGT:
+                return "SETGT";
+            case BR:
+                return "BR";
+            case BRFALSE:
+                return "BRFALSE";
+            case BRTRUE:
+                return "BRTRUE";
+            case CALL:
+                return "CALL";
+            case RET:
+                return "RET";
+            case CALLNAME:
+                return "CALLNAME";
+            case SCANI:
+                return "SCANI";
+            case SCANF:
+                return "SCANF";
+            case PRINTI:
+                return "PRINTI";
+            case PRINTC:
+                return "PRINTC";
+            case PRINTF:
+                return "PRINTF,";
+            case PRINTS:
+                return "PRINTS";
+            case PRINTLN:
+                return "PRINTLN";
+            case PANIC:
+                return "PANIC";
+            default:
+                return "InvalidOperation";
+        }
+    }
 }

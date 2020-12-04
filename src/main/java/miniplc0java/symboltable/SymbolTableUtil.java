@@ -1,7 +1,6 @@
 package miniplc0java.symboltable;
 
 import miniplc0java.error.AnalyzeError;
-import miniplc0java.error.CompileError;
 import miniplc0java.error.ErrorCode;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.util.Pos;
@@ -17,6 +16,10 @@ public class SymbolTableUtil {
         return rootTable.getMap();
     }
 
+    public int addEmptyGlobalEntry() {
+        return rootTable.getNextVariableOffset();
+    }
+
     public SymbolEntry getSymbolEntry(String name, Pos curPos) throws AnalyzeError {
         SymbolTable temp = currentTable;
         while (temp != null) {
@@ -26,12 +29,13 @@ public class SymbolTableUtil {
         }
         throw new AnalyzeError(ErrorCode.NotDeclared, curPos);
     }
+
     public boolean isGlobal(String name, Pos curPos) throws AnalyzeError {
         SymbolTable temp = currentTable;
         while (temp != null) {
             SymbolEntry entry = temp.getMap().get(name);
             if (entry != null) {
-                if(temp.getParent()==null) return true;
+                if (temp.getParent() == null) return true;
                 return false;
             }
             temp = temp.getParent();
@@ -59,6 +63,10 @@ public class SymbolTableUtil {
 
     public void addSymbol(String name, TokenType type, boolean isInitialized, boolean isConstant, Pos curPos) throws AnalyzeError {
         currentTable.addSymbol(name, type, isInitialized, isConstant, curPos);
+    }
+
+    public void addGlobalSymbol(String name, TokenType type, boolean isInitialized, boolean isConstant, Pos curPos) throws AnalyzeError {
+        rootTable.addSymbol(name, type, isInitialized, isConstant, curPos);
     }
 
     public void addParam(String name, TokenType type, boolean isConstant, Pos curPos, int offset) throws AnalyzeError {
@@ -147,7 +155,7 @@ class SymbolTable {
      *
      * @return
      */
-    private int getNextVariableOffset() {
+    public int getNextVariableOffset() {
         return this.nextOffset++;
     }
 

@@ -110,7 +110,8 @@ public class Tokenizer {
             throw new TokenizeError(ErrorCode.InvalidString,it.currentPos());
         }
         sb.append(it.nextChar());
-        return new Token(TokenType.String,sb.toString(),start,it.currentPos());
+        String value = sb.toString();
+        return new Token(TokenType.String,value.substring(1,value.length()-1),start,it.currentPos());
     }
 
     private Token lexUIntOrDouble() throws TokenizeError {

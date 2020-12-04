@@ -30,6 +30,14 @@ public class GlobalDef implements Comparable<GlobalDef>{
             this.value = new int[8];
         }
     }
+    public GlobalDef(int offset,String value){
+        is_const = true;
+        this.offset = offset;
+        this.value = new int[value.length()];
+        for(int i=0;i<value.length();i++){
+            this.value[i]=(int)value.charAt(i);
+        }
+    }
 
     @Override
     public String toString() {
