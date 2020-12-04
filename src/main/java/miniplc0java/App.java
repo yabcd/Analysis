@@ -101,8 +101,7 @@ public class App {
                 program = analyzer.analyse();
             } catch (Exception e) {
                 // 遇到错误不输出，直接退出
-                System.err.println(e);
-                System.exit(0);
+                System.exit(-1);
                 return;
             }
             output.writeBytes(program.getBytes());
