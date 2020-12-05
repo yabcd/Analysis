@@ -51,7 +51,6 @@ public class Tokenizer {
     private Token lexChar() throws TokenizeError {
         Pos start = it.currentPos();
         StringBuffer sb = new StringBuffer();
-        sb.append(it.nextChar());
         char peek = it.peekChar();
         if(peek!='\''&&peek!='\0'&&peek!='\n'){
             if(peek=='\\'){
@@ -71,8 +70,7 @@ public class Tokenizer {
         if(it.peekChar()!='\''){
             throw new TokenizeError(ErrorCode.InvalidChar,it.currentPos());
         }
-        sb.append(it.nextChar());
-        return new Token(TokenType.String,sb.toString(),start,it.currentPos());
+        return new Token(TokenType.Uint,(int)(sb.toString().charAt(0)),start,it.currentPos());
     }
 
     private boolean isEscape_sequence(char peek){

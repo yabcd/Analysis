@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Scanner;
 
 import static org.junit.Assert.*;
@@ -27,10 +29,13 @@ public class AnalyserTest {
         return new Analyser(tokenizer);
     }
 
-    private void testAnalyser(String path) throws CompileError {
+    private void testAnalyser(String path) throws CompileError, IOException {
         Analyser analyser = init("C:\\Users\\hp\\IdeaProjects\\miniplc0-java-master\\src\\test\\java\\miniplc0java\\"+path);
         o0 analyse = analyser.analyse();
         byte[] bytes = analyse.getBytes();
+        FileOutputStream fis = new FileOutputStream(new File("C:\\Users\\hp\\IdeaProjects\\miniplc0-java-master\\src\\test\\java\\miniplc0java\\test2.txt"));
+        fis.write(bytes);
+        fis.close();
         for(byte b:bytes){
             System.out.print(Integer.toHexString(Integer.valueOf(b))+" ");
         }
@@ -38,12 +43,12 @@ public class AnalyserTest {
         System.out.println(analyse.getFunctions());
     }
     @Test
-    public void test1() throws CompileError {
+    public void test1() throws CompileError, IOException {
         testAnalyser("test1.txt");
     }
 
     @Test
-    public void test2() throws CompileError {
+    public void test2() throws CompileError, IOException {
         testAnalyser("test2.txt");
     }
 

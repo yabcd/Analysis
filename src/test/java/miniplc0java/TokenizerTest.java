@@ -65,5 +65,7 @@ public class TokenizerTest {
         byte b = -1;
         System.out.println(Integer.toHexString(Integer.valueOf(b)));
         System.out.println(Integer.valueOf("0a",16));
+        char c = "\n".charAt(0);
+        System.out.println("int"+":"+(int)c);
     }
 }
