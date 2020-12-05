@@ -374,6 +374,9 @@ public final class Analyser {
         if(!ifReturn&&curReturnType!=TokenType.Void){
             throw new AnalyzeError(ErrorCode.NotAllRoutesReturn,funName.getStartPos());
         }
+        if(returnType==TokenType.Void){
+            instructions.add(new Instruction(Operation.RET));
+        }
     }
 
     private void analyseFunctionParmList(List<TokenType> params) throws CompileError {
@@ -558,7 +561,7 @@ public final class Analyser {
         ifReturn = true;
     }
 
-    private void analyseIdentExpression() throws CompileError{
+    private TokenType analyseIdentExpression() throws CompileError{
         Token ident = expect(TokenType.Ident);
         if (check(TokenType.Assign)) {//赋值语句
             Token assign = expect(TokenType.Assign);
@@ -625,15 +628,17 @@ public final class Analyser {
             }
         }else{//标识符表达式
             getVariableAddr(ident);
+            ident.setTokenType(symbolTable.getType(ident.getValueString(),ident.getStartPos()));
             instructions.add(new Instruction(Operation.LOAD64));
         }
 
         pushToken(ident);
+        return ident.getTokenType();
     }
 
-    private void analyseOtherExpression() throws CompileError {
+    private TokenType analyseOtherExpression() throws CompileError {
         if (check(TokenType.Ident)) {
-            analyseIdentExpression();
+            return analyseIdentExpression();
         } else if (check(TokenType.Uint) || check(TokenType.Double) || check(TokenType.String)) {
             Token next = next();
             if(next.getTokenType()==TokenType.Uint) instructions.add(new Instruction(Operation.PUSH,(Long)next.getValue()));
@@ -647,6 +652,7 @@ public final class Analyser {
                 next.setValue(offset);
             }
             pushToken(next);
+            return next.getTokenType();
         } else if (check(TokenType.LParen)) {
             Token LParen = expect(TokenType.LParen);
             operator.add(new Token(TokenType.Semicolon,peek()));
@@ -654,6 +660,7 @@ public final class Analyser {
             operator.pop();
             pushToken(new Token(tokenType,LParen));
             expect(TokenType.RParen);
+            return tokenType;
         }else {
             throw new AnalyzeError(ErrorCode.UnExpectedToken,peek().getStartPos());
         }
