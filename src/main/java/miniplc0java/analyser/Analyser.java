@@ -505,17 +505,17 @@ public final class Analyser {
         }
         ifBlockLength.setX(Long.valueOf(instructions.size()-size1+1));
         if (check(TokenType.Else)) {
+            Instruction elseBlockLength = new Instruction(Operation.BR, 0L);
+            instructions.add(elseBlockLength);
+            int size = instructions.size();
             expect(TokenType.Else);
             if (check(TokenType.If)) {
                 analyseIfStatement();
-            } else {
-                Instruction elseBlockLength = new Instruction(Operation.BR, 0L);
-                instructions.add(ifBlockLength);
-                int size = instructions.size();
+            }else{
                 analyseBlockStatement();
-                ifBlockLength.setX(Long.valueOf(instructions.size()-size+1));
-                instructions.add(new Instruction(Operation.BR,0L));
             }
+            elseBlockLength.setX(Long.valueOf(instructions.size()-size+1));
+            instructions.add(new Instruction(Operation.BR,0L));
         }else{
             ifReturn = true;
         }

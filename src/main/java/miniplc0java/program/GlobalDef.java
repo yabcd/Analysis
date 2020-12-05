@@ -31,7 +31,8 @@ public class GlobalDef implements Comparable<GlobalDef>{
         }
     }
     public GlobalDef(int offset,String value){
-        value = value.replace("\\\\","\\").replace("\\n",(char)10+"");
+        value = value.replace("\\\\","\\").replace("\\n",(char)10+"")
+                .replace("\\\"","\"").replace("\\\'","\'");
         is_const = true;
         this.offset = offset;
         this.value = new int[value.length()];
