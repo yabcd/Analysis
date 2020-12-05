@@ -14,6 +14,11 @@ public class FunctionDef {
 
     int return_slots;
     int param_slots;
+
+    public void setLoc_slots(int loc_slots) {
+        this.loc_slots = loc_slots;
+    }
+
     int loc_slots;
     ArrayList<Instruction> body;
 

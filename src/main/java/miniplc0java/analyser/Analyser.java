@@ -366,10 +366,12 @@ public final class Analyser {
         int name = symbolTable.getGlobalOffset(nameValueString,funName.getStartPos());
         int return_slots = (funName.getTokenType()==TokenType.Void)?0:1;
         int param_slots = params.size();
-        int loc_slots = symbolTable.getCurrentSize()-param_slots;
-        program.getFunctions().add(new FunctionDef(name,return_slots,param_slots,loc_slots,instructions));
+        FunctionDef functionDef = new FunctionDef(name, return_slots, param_slots, 0, instructions);
+        program.getFunctions().add(functionDef);
 
         analyseBlockStatement();
+        int loc_slots = symbolTable.getCurrentSize()-param_slots;
+        functionDef.setLoc_slots(loc_slots);
         //退出作用域
         symbolTable.deleteCurrentTable();
         if(!ifReturn&&curReturnType!=TokenType.Void){
