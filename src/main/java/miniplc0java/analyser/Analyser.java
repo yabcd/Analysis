@@ -407,7 +407,8 @@ public final class Analyser {
     }
 
     private void analyseStatement() throws CompileError {
-        if(ifReturn) return;
+        ArrayList<Instruction> temp = null;
+        if(ifReturn) temp= new ArrayList<>(this.instructions);
         TokenType peek = peek().getTokenType();
         switch (peek) {
             case If -> analyseIfStatement();
@@ -419,6 +420,7 @@ public final class Analyser {
             case Const -> analyseConstStatement();
             default -> analyseExpressionStatement();
         }
+        if(temp!=null) instructions=temp;
     }
 
     //表达式语句
