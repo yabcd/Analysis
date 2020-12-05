@@ -407,7 +407,7 @@ public final class Analyser {
     }
 
     private void analyseStatement() throws CompileError {
-        TokenType returnType = null;
+        if(ifReturn) return;
         TokenType peek = peek().getTokenType();
         switch (peek) {
             case If -> analyseIfStatement();
@@ -507,9 +507,7 @@ public final class Analyser {
         }
         ifBlockLength.setX(Long.valueOf(instructions.size()-size1+1));
         Instruction elseBlockLength= new Instruction(Operation.BR, 0L);
-        if(!ifBlockReturn){
-            instructions.add(elseBlockLength);
-        }
+        instructions.add(elseBlockLength);
 
         if (check(TokenType.Else)) {
             int size = instructions.size();
