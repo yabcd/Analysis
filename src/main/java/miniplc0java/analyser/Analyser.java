@@ -364,7 +364,7 @@ public final class Analyser {
         instructions = new ArrayList<>();
         String nameValueString = funName.getValueString();
         int name = symbolTable.getGlobalOffset(nameValueString,funName.getStartPos());
-        int return_slots = (funName.getTokenType()==TokenType.Void)?0:1;
+        int return_slots = (returnType==TokenType.Void)?0:1;
         int param_slots = params.size();
         FunctionDef functionDef = new FunctionDef(name, return_slots, param_slots, 0, instructions);
         program.getFunctions().add(functionDef);
@@ -574,6 +574,8 @@ public final class Analyser {
     private TokenType analyseIdentExpression() throws CompileError{
         Token ident = expect(TokenType.Ident);
         if (check(TokenType.Assign)) {//赋值语句
+            boolean constant = symbolTable.isConstant(ident.getValueString(), ident.getStartPos());
+            if(constant) throw new AnalyzeError(ErrorCode.AssignToConst, ident.getEndPos());
             Token assign = expect(TokenType.Assign);
             getVariableAddr(ident.getValueString(),ident.getStartPos());//将变量地址加载到栈顶
             TokenType type1 = analyseExpression();

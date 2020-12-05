@@ -86,7 +86,8 @@ public class SymbolTableUtil {
     }
 
     public boolean isConstant(String name, Pos curPos) throws AnalyzeError {
-        return currentTable.isConstant(name, curPos);
+        SymbolEntry symbolEntry = this.getSymbolEntry(name, curPos);
+        return symbolEntry.getConst();
     }
 
     public void deleteCurrentTable() {

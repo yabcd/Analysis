@@ -1,13 +1,39 @@
 fn main() -> void {
 
-    let x: int = ----1;
+    let needle: int;
 
-    let y: int = 2;
+    let low: int = 0;
 
-    let z: int;
+    let high: int = 1024;
 
-    z = x + y;
+    let mid: int;
 
-    putint(z);
+    needle = getint();
+
+    while low != high {
+
+        mid = (low + high + 1) / 2;
+
+        putint(mid);
+
+        putln();
+
+        if mid > needle {
+
+            high = mid;
+
+        } else if mid == needle {
+
+            low = mid;
+
+            high = mid;
+
+        } else {
+
+            low = mid;
+
+        }
+
+    }
 
 }

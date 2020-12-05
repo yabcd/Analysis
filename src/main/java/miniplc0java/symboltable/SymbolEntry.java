@@ -11,7 +11,11 @@ public class SymbolEntry {
     TokenType type;//数据真实类型，int，double
     TokenType returnType;
 
+
     List<TokenType> params;
+    public Boolean getConst(){
+        return isConstant;
+    }
 
     public List<TokenType> getParams() {
         return params;
