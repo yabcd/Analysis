@@ -114,6 +114,7 @@ public final class Analyser {
         //栈内优先级
         int y = checkOperator(vtToken);
         while(vtToken!=null&&x<=y&&y!=0){
+            if(x==y&&vtToken.getTokenType()==TokenType.Nege) break;
             //进行一次运算
             analyseOperator();
 
@@ -448,11 +449,13 @@ public final class Analyser {
         Token ident = expect(TokenType.Ident);
         expect(TokenType.Colon);
         TokenType type= analyseType();
+        if(type==TokenType.Void) throw new AnalyzeError(ErrorCode.VoidTypeVariable,ident.getEndPos());
         symbolTable.addSymbol(ident.getValueString(),type,false,false,ident.getStartPos());
 
         if (nextIf(TokenType.Assign) != null) {
             getVariableAddr(ident);
-            analyseExpression();
+            TokenType tokenType = analyseExpression();
+            if(tokenType!=type) throw new AnalyzeError(ErrorCode.TypeMismatch, ident.getStartPos());
             symbolTable.declareSymbol(ident.getValueString(),peek().getStartPos());
             instructions.add(new Instruction(Operation.STORE64));
         }
@@ -465,15 +468,17 @@ public final class Analyser {
         Token ident = expect(TokenType.Ident);
         expect(TokenType.Colon);
 
+        TokenType type = analyseType();
+        symbolTable.addSymbol(ident.getValueString(),type,true,true,ident.getStartPos());
         getVariableAddr(ident);
 
-        TokenType type = analyseType();
+
+        if(type==TokenType.Void) throw new AnalyzeError(ErrorCode.VoidTypeVariable,ident.getEndPos());
         expect(TokenType.Assign);
-        analyseExpression();
-        symbolTable.addSymbol(ident.getValueString(),type,true,true,ident.getStartPos());
+        TokenType tokenType = analyseExpression();
+        if(tokenType!=type) throw new AnalyzeError(ErrorCode.TypeMismatch, ident.getStartPos());
 
         instructions.add(new Instruction(Operation.STORE64));
-
         expect(TokenType.Semicolon);
     }
 
@@ -545,7 +550,7 @@ public final class Analyser {
 
     //return语句
     private void analyseReturnStatement() throws CompileError {
-        expect(TokenType.Return);
+        Token expect = expect(TokenType.Return);
         if (!check(TokenType.Semicolon)) {
             instructions.add(new Instruction(Operation.ARGA,0L));
             Token peek = peek();
@@ -555,8 +560,12 @@ public final class Analyser {
                 throw new AnalyzeError(ErrorCode.TypeMismatch,peek.getStartPos());
             }
             instructions.add(new Instruction(Operation.STORE64));
+        }else{
+            if(curReturnType!=TokenType.Void)
+                throw new AnalyzeError(ErrorCode.TypeMismatch,expect.getStartPos());
+            instructions.add(new Instruction(Operation.RET));
         }
-        instructions.add(new Instruction(Operation.RET));
+
         expect(TokenType.Semicolon);
         ifReturn = true;
     }
