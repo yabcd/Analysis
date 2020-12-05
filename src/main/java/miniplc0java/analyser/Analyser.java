@@ -504,9 +504,9 @@ public final class Analyser {
             ifBlockReturn = true;
         }
         ifBlockLength.setX(Long.valueOf(instructions.size()-size1+1));
+        Instruction elseBlockLength = new Instruction(Operation.BR, 0L);
+        instructions.add(elseBlockLength);
         if (check(TokenType.Else)) {
-            Instruction elseBlockLength = new Instruction(Operation.BR, 0L);
-            instructions.add(elseBlockLength);
             int size = instructions.size();
             expect(TokenType.Else);
             if (check(TokenType.If)) {
