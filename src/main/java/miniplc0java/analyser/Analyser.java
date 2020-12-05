@@ -407,8 +407,8 @@ public final class Analyser {
     }
 
     private void analyseStatement() throws CompileError {
-        ArrayList<Instruction> temp = null;
-        if(ifReturn) temp= new ArrayList<>(this.instructions);
+//        ArrayList<Instruction> temp = null;
+//        if(ifReturn) temp= new ArrayList<>(this.instructions);
         TokenType peek = peek().getTokenType();
         switch (peek) {
             case If -> analyseIfStatement();
@@ -420,7 +420,7 @@ public final class Analyser {
             case Const -> analyseConstStatement();
             default -> analyseExpressionStatement();
         }
-        if(temp!=null) instructions=temp;
+//        if(temp!=null) instructions=temp;
     }
 
     //表达式语句
@@ -583,7 +583,9 @@ public final class Analyser {
             if(constant) throw new AnalyzeError(ErrorCode.AssignToConst, ident.getEndPos());
             Token assign = expect(TokenType.Assign);
             getVariableAddr(ident.getValueString(),ident.getStartPos());//将变量地址加载到栈顶
+            operator.add(new Token(TokenType.Semicolon,peek()));
             TokenType type1 = analyseExpression();
+            operator.pop();
             instructions.add(new Instruction(Operation.STORE64));
 
             if(symbolTable.getType(ident.getValueString(),ident.getStartPos())!=type1){
@@ -624,7 +626,9 @@ public final class Analyser {
 
             int index = 0;
             if(!check(TokenType.RParen)){
+                operator.add(new Token(TokenType.Semicolon,peek()));
                 TokenType eType = analyseExpression();
+                operator.pop();
                 if(index>=params.size()) throw new AnalyzeError(ErrorCode.FuncParamSizeMismatch,peek().getStartPos());
                 if(params.get(index++)!=eType) throw new AnalyzeError(ErrorCode.TypeMismatch,peek().getStartPos());
             }
@@ -687,6 +691,7 @@ public final class Analyser {
     private TokenType analyseExpression() throws CompileError {
         if (!check(TokenType.Minus)) {
             analyseOtherExpression();
+
         } else {
             Token expect = expect(TokenType.Minus);
             expect.setTokenType(TokenType.Nege);
