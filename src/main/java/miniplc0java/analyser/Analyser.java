@@ -129,10 +129,12 @@ public final class Analyser {
         Token y = operator.pop();
         Token op = operator.pop();
         if(op.getTokenType()==TokenType.Nege){
-            if(y.getTokenType()==TokenType.Ident) symbolTable.getType(y.getValueString(),y.getStartPos());
+            TokenType type = y.getTokenType();
+            if(y.getTokenType()==TokenType.Ident) type = symbolTable.getType(y.getValueString(),y.getStartPos());
             y.setStartPos(op.getStartPos());
             operator.push(y);
-            instructions.add(new Instruction(Operation.NEGI));
+            if(type==TokenType.Double) instructions.add(new Instruction(Operation.NEGF));
+            else if(type==TokenType.Uint)instructions.add(new Instruction(Operation.NEGI));
             return;
         }
 
@@ -504,8 +506,11 @@ public final class Analyser {
             ifBlockReturn = true;
         }
         ifBlockLength.setX(Long.valueOf(instructions.size()-size1+1));
-        Instruction elseBlockLength = new Instruction(Operation.BR, 0L);
-        instructions.add(elseBlockLength);
+        Instruction elseBlockLength= new Instruction(Operation.BR, 0L);
+        if(!ifBlockReturn){
+            instructions.add(elseBlockLength);
+        }
+
         if (check(TokenType.Else)) {
             int size = instructions.size();
             expect(TokenType.Else);
