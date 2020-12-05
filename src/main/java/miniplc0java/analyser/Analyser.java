@@ -372,7 +372,7 @@ public final class Analyser {
         program.getFunctions().add(functionDef);
 
         analyseBlockStatement();
-        int loc_slots = symbolTable.getCurrentSize()-param_slots;
+        int loc_slots = symbolTable.getMaxSize()-param_slots;
         functionDef.setLoc_slots(loc_slots);
         //退出作用域
         symbolTable.deleteCurrentTable();
@@ -532,11 +532,13 @@ public final class Analyser {
 
     //代码块
     private void analyseBlockStatement() throws CompileError {
+        symbolTable.createTable(true);
         expect(TokenType.LBrace);
         while (!check(TokenType.RBrace)) {
             analyseStatement();
         }
         expect(TokenType.RBrace);
+        symbolTable.deleteCurrentTable();
     }
 
     //while语句

@@ -56,6 +56,13 @@ public class SymbolTableUtil {
         return currentTable.getMap().size();
     }
 
+    public int getMaxSize(){
+        int maxSize = currentTable.getMaxSize();
+        int size = currentTable.getMap().size();
+        if(size>maxSize) return size;
+        return maxSize;
+    }
+
     public SymbolTableUtil() {
         currentTable = new SymbolTable(null);
         rootTable = currentTable;
@@ -91,7 +98,9 @@ public class SymbolTableUtil {
     }
 
     public void deleteCurrentTable() {
+        int size = currentTable.getParent().getMap().size()+currentTable.getMap().size();
         currentTable = currentTable.getParent();
+        if(size > currentTable.getMaxSize()) currentTable.setMaxSize(size);
     }
 
     public void createTable(boolean ifBlock) {
@@ -104,6 +113,17 @@ public class SymbolTableUtil {
 }
 
 class SymbolTable {
+
+    int maxSize=0;
+
+    public int getMaxSize() {
+        return maxSize;
+    }
+
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
+    }
+
     /**
      * 符号表
      */
