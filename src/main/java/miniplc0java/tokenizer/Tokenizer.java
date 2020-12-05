@@ -72,7 +72,17 @@ public class Tokenizer {
             throw new TokenizeError(ErrorCode.InvalidChar,it.currentPos());
         }
         it.nextChar();
-        int i = (sb.toString().charAt(0));
+        String s = sb.toString();
+        int i;
+        switch (s){
+            case "\\n": i='\n';break;
+            case "\\'": i='\'';break;
+            case "\\\"":i='\"';break;
+            case "\\\\":i='\\';break;
+            case "\\t":i='\t';break;
+            case "\\r":i='\n';break;
+            default:i=(int)s.charAt(0);
+        }
         return new Token(TokenType.Uint,Long.valueOf(i),start,it.currentPos());
     }
 
