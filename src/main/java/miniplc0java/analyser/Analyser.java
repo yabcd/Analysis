@@ -563,9 +563,8 @@ public final class Analyser {
         }else{
             if(curReturnType!=TokenType.Void)
                 throw new AnalyzeError(ErrorCode.TypeMismatch,expect.getStartPos());
-            instructions.add(new Instruction(Operation.RET));
         }
-
+        instructions.add(new Instruction(Operation.RET));
         expect(TokenType.Semicolon);
         ifReturn = true;
     }
