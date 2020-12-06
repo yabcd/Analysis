@@ -5,5 +5,9 @@ fn main() -> void {
         let i:int =9;
         putint(i);
     }
+    if(i>1){
+        let i:int =9;
+        putint(i);
+    }
 
 }

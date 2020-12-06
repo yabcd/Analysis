@@ -16,6 +16,7 @@ import miniplc0java.tokenizer.Token;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.tokenizer.Tokenizer;
 import miniplc0java.util.Pos;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.*;
 
@@ -308,19 +309,18 @@ public final class Analyser {
 
     private void analyseProgram() throws CompileError {
         Token peek = peek();
-        while (check(TokenType.Let)||check(TokenType.Const)) {
-            if(check(TokenType.Let)) analyseLetStatement();
-            else analyseConstStatement();
-        }
-
-        globalInstructions = new ArrayList<>(instructions);
+        globalInstructions = instructions;
         FunctionDef startFun = new FunctionDef(-1, 0, 0, 0, globalInstructions);
         program.getFunctions().add(startFun);
-
-        while (check(TokenType.Fn)) {
-            analyseFunction();
+        while (check(TokenType.Let)||check(TokenType.Const)||check(TokenType.Fn)) {
+            if(check(TokenType.Let)) analyseLetStatement();
+            else if(check(TokenType.Const))analyseConstStatement();
+            else analyseFunction();
         }
         expect(TokenType.EOF);
+
+
+
 
         //添加_start符号表
         symbolTable.addFunction("_start",TokenType.Void,new ArrayList<>(), peek().getStartPos());
@@ -363,6 +363,7 @@ public final class Analyser {
         symbolTable.addFunction(funName.getValueString(),returnType,params,funName.getStartPos());
 
         //添加函数列表
+        globalInstructions = instructions;
         instructions = new ArrayList<>();
         String nameValueString = funName.getValueString();
         int name = symbolTable.getGlobalOffset(nameValueString,funName.getStartPos());
@@ -371,7 +372,7 @@ public final class Analyser {
         FunctionDef functionDef = new FunctionDef(name, return_slots, param_slots, 0, instructions);
         program.getFunctions().add(functionDef);
 
-        analyseBlockStatement();
+        analyseBlockStatement(TokenType.Fn);
         int loc_slots = symbolTable.getMaxSize()-param_slots;
         functionDef.setLoc_slots(loc_slots);
         //退出作用域
@@ -382,6 +383,7 @@ public final class Analyser {
         if(returnType==TokenType.Void){
             instructions.add(new Instruction(Operation.RET));
         }
+        instructions=globalInstructions;
     }
 
     private void analyseFunctionParmList(List<TokenType> params) throws CompileError {
@@ -414,7 +416,7 @@ public final class Analyser {
             case If -> analyseIfStatement();
             case While -> analyseWhileStatement();
             case Return ->  analyseReturnStatement();
-            case LBrace ->  analyseBlockStatement();
+            case LBrace ->  analyseBlockStatement(TokenType.Void);
             case Semicolon -> analyseEmptyStatement();
             case Let -> analyseLetStatement();
             case Const -> analyseConstStatement();
@@ -501,7 +503,7 @@ public final class Analyser {
         Instruction ifBlockLength = new Instruction(Operation.BR, 0L);
         instructions.add(ifBlockLength);
         int size1 = instructions.size();
-        analyseBlockStatement();
+        analyseBlockStatement(TokenType.If);
         Boolean ifBlockReturn = false;
         if(ifReturn){//if分支可以返回
             ifReturn = false;
@@ -517,7 +519,7 @@ public final class Analyser {
             if (check(TokenType.If)) {
                 analyseIfStatement();
             }else{
-                analyseBlockStatement();
+                analyseBlockStatement(TokenType.Else);
             }
             elseBlockLength.setX(Long.valueOf(instructions.size()-size+1));
             instructions.add(new Instruction(Operation.BR,0L));
@@ -531,14 +533,14 @@ public final class Analyser {
     }
 
     //代码块
-    private void analyseBlockStatement() throws CompileError {
-        symbolTable.createTable(true);
+    private void analyseBlockStatement(TokenType tokenType) throws CompileError {
+        if(tokenType!=TokenType.Fn)symbolTable.createTable(true);
         expect(TokenType.LBrace);
         while (!check(TokenType.RBrace)) {
             analyseStatement();
         }
         expect(TokenType.RBrace);
-        symbolTable.deleteCurrentTable();
+        if(tokenType!=TokenType.Fn)symbolTable.deleteCurrentTable();
     }
 
     //while语句
@@ -551,7 +553,7 @@ public final class Analyser {
         Instruction whileBlock = new Instruction(Operation.BR, 0L);
         instructions.add(whileBlock);
         int size2 = instructions.size();
-        analyseBlockStatement();
+        analyseBlockStatement(TokenType.While);
         int size3 = instructions.size();
         instructions.add(new Instruction(Operation.BR,Long.valueOf(size1-size3-1)));
         whileBlock.setX(Long.valueOf(size3-size2+1));
