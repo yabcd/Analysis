@@ -98,7 +98,7 @@ public class SymbolTableUtil {
     }
 
     public void deleteCurrentTable() {
-        int size = currentTable.getParent().getMap().size()+currentTable.getMap().size();
+        int size = currentTable.getParent().getMap().size()+currentTable.getMaxSize();
         currentTable = currentTable.getParent();
         if(size > currentTable.getMaxSize()) currentTable.setMaxSize(size);
     }
@@ -117,7 +117,9 @@ class SymbolTable {
     int maxSize=0;
 
     public int getMaxSize() {
-        return maxSize;
+        int size = this.getMap().size();
+        if(maxSize>size)  return maxSize;
+        return size;
     }
 
     public void setMaxSize(int maxSize) {
