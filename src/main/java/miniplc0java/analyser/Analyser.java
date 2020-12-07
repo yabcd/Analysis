@@ -583,7 +583,7 @@ public final class Analyser {
 
         Instruction pop = whileStack.pop();
         while(pop !=null){
-            pop.setX(Long.valueOf(size3-pop.getX()+1));
+            pop.setX(Long.valueOf(size3-pop.getX()));
             pop = whileStack.pop();
         }
         continueSize = oldsize;
