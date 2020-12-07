@@ -43,6 +43,10 @@ public final class Analyser {
     Boolean ifReturn = false;
     TokenType curReturnType;
 
+    //while起始和结束的指令集大小
+    int whileBegin = -1;
+    int whileEnd = -1;
+
 
     /**
      *运算符栈
