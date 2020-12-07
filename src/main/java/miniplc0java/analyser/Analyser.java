@@ -16,7 +16,6 @@ import miniplc0java.tokenizer.Token;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.tokenizer.Tokenizer;
 import miniplc0java.util.Pos;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.*;
 
@@ -47,6 +46,9 @@ public final class Analyser {
     int whileBegin = -1;
     int whileEnd = -1;
 
+    //while Stack
+    Stack<Instruction> whileStack = new Stack<>();
+    int continueSize;
 
     /**
      *运算符栈
@@ -413,8 +415,6 @@ public final class Analyser {
     }
 
     private void analyseStatement() throws CompileError {
-//        ArrayList<Instruction> temp = null;
-//        if(ifReturn) temp= new ArrayList<>(this.instructions);
         TokenType peek = peek().getTokenType();
         switch (peek) {
             case If -> analyseIfStatement();
@@ -424,9 +424,25 @@ public final class Analyser {
             case Semicolon -> analyseEmptyStatement();
             case Let -> analyseLetStatement();
             case Const -> analyseConstStatement();
+            case Continue ->anaContinueStatement();
+            case Break -> anaBreakStatement();
             default -> analyseExpressionStatement();
         }
-//        if(temp!=null) instructions=temp;
+    }
+
+    private void anaBreakStatement() throws CompileError {
+        if(whileStack.size()==0) throw new AnalyzeError(ErrorCode.UnExpectedToken, peek().getStartPos());
+        expect(TokenType.Break);expect(TokenType.Semicolon);
+        Instruction in = new Instruction(Operation.BR, Long.valueOf(instructions.size()));
+        whileStack.push(in);
+        instructions.add(in);
+    }
+
+    private void anaContinueStatement() throws CompileError {
+        if(whileStack.size()==0) throw new AnalyzeError(ErrorCode.UnExpectedToken, peek().getStartPos());
+        expect(TokenType.Continue);expect(TokenType.Semicolon);
+        int nowSize = instructions.size();
+        instructions.add(new Instruction(Operation.BR,Long.valueOf(continueSize-nowSize-1)));
     }
 
     //表达式语句
@@ -547,47 +563,30 @@ public final class Analyser {
         if(tokenType!=TokenType.Fn)symbolTable.deleteCurrentTable();
     }
 
-    private List<Instruction> analyseWhileBlockStatement(int size1) throws CompileError {
-        List<Instruction> res = new ArrayList<>();
-        symbolTable.createTable(true);
-        expect(TokenType.LBrace);
-        while (!check(TokenType.RBrace)) {
-            if(check(TokenType.Continue)){
-                expect(TokenType.Continue);expect(TokenType.Semicolon);
-                int nowSize = instructions.size();
-                instructions.add(new Instruction(Operation.BR,Long.valueOf(size1-nowSize-1)));
-            }else if(check(TokenType.Break)){
-                expect(TokenType.Break);expect(TokenType.Semicolon);
-                Instruction in = new Instruction(Operation.BR, Long.valueOf(instructions.size()));
-                instructions.add(in);
-                res.add(in);
-            }else{
-                analyseStatement();
-            }
-
-        }
-        expect(TokenType.RBrace);
-        symbolTable.deleteCurrentTable();
-        return res;
-    }
-
     //while语句
     private void analyseWhileStatement() throws CompileError {
         instructions.add(new Instruction(Operation.BR,0L));
         int size1 = instructions.size();//起始大小
+        whileStack.push(null);
+        int oldsize = continueSize;
+        continueSize = size1;
         expect(TokenType.While);
         analyseExpression();
         instructions.add(new Instruction(Operation.BRTRUE,1L));
         Instruction whileBlock = new Instruction(Operation.BR, 0L);
         instructions.add(whileBlock);
         int size2 = instructions.size();
-        List<Instruction> res = analyseWhileBlockStatement(size1);
+        analyseBlockStatement(TokenType.While);
         int size3 = this.instructions.size();
         this.instructions.add(new Instruction(Operation.BR,Long.valueOf(size1-size3-1)));
         whileBlock.setX(Long.valueOf(size3-size2+1));
-        for(Instruction i:res){
-            i.setX(Long.valueOf(size3-i.getX()+1));
+
+        Instruction pop = whileStack.pop();
+        while(pop !=null){
+            pop.setX(Long.valueOf(size3-pop.getX()+1));
+            pop = whileStack.pop();
         }
+        continueSize = oldsize;
     }
 
     //return语句
@@ -726,7 +725,6 @@ public final class Analyser {
     private TokenType analyseExpression() throws CompileError {
         if (!check(TokenType.Minus)) {
             analyseOtherExpression();
-
         } else {
             Token expect = expect(TokenType.Minus);
             expect.setTokenType(TokenType.Nege);
