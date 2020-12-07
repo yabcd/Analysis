@@ -547,20 +547,47 @@ public final class Analyser {
         if(tokenType!=TokenType.Fn)symbolTable.deleteCurrentTable();
     }
 
+    private List<Instruction> analyseWhileBlockStatement(int size1) throws CompileError {
+        List<Instruction> res = new ArrayList<>();
+        symbolTable.createTable(true);
+        expect(TokenType.LBrace);
+        while (!check(TokenType.RBrace)) {
+            if(check(TokenType.Continue)){
+                expect(TokenType.Continue);expect(TokenType.Semicolon);
+                int nowSize = instructions.size();
+                instructions.add(new Instruction(Operation.BR,Long.valueOf(size1-nowSize-1)));
+            }else if(check(TokenType.Break)){
+                expect(TokenType.Break);expect(TokenType.Semicolon);
+                Instruction in = new Instruction(Operation.BR, Long.valueOf(instructions.size()));
+                instructions.add(in);
+                res.add(in);
+            }else{
+                analyseStatement();
+            }
+
+        }
+        expect(TokenType.RBrace);
+        symbolTable.deleteCurrentTable();
+        return res;
+    }
+
     //while语句
     private void analyseWhileStatement() throws CompileError {
         instructions.add(new Instruction(Operation.BR,0L));
-        int size1 = instructions.size();
+        int size1 = instructions.size();//起始大小
         expect(TokenType.While);
         analyseExpression();
         instructions.add(new Instruction(Operation.BRTRUE,1L));
         Instruction whileBlock = new Instruction(Operation.BR, 0L);
         instructions.add(whileBlock);
         int size2 = instructions.size();
-        analyseBlockStatement(TokenType.While);
-        int size3 = instructions.size();
-        instructions.add(new Instruction(Operation.BR,Long.valueOf(size1-size3-1)));
+        List<Instruction> res = analyseWhileBlockStatement(size1);
+        int size3 = this.instructions.size();
+        this.instructions.add(new Instruction(Operation.BR,Long.valueOf(size1-size3-1)));
         whileBlock.setX(Long.valueOf(size3-size2+1));
+        for(Instruction i:res){
+            i.setX(Long.valueOf(size3-i.getX()+1));
+        }
     }
 
     //return语句
